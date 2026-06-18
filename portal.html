@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Portal</title>
+    <style>
+        body { background: #0A0A0A; color: white; font-family: sans-serif; padding: 20px; }
+        .btn { padding: 14px 28px; background: #F59E0B; color: #000; border: none; border-radius: 40px; font-weight: 700; font-size: 16px; cursor: pointer; }
+        .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: #141414; padding: 30px; border-radius: 16px; max-width: 400px; width: 100%; }
+        .modal-content input { width: 100%; padding: 12px; margin-bottom: 12px; background: #1E1E1E; border: 1px solid #2A2A2A; border-radius: 8px; color: white; }
+        .close-btn { padding: 10px 20px; background: #EF4444; color: white; border: none; border-radius: 8px; cursor: pointer; }
+        .save-btn { padding: 10px 20px; background: #F59E0B; color: #000; border: none; border-radius: 8px; cursor: pointer; margin-right: 8px; }
+    </style>
+</head>
+<body>
+
+    <h1>Debug Mode - Modal Always Visible</h1>
+
+    <div class="modal">
+        <div class="modal-content">
+            <h2>Add Client</h2>
+            <input type="text" placeholder="Client Name" />
+            <input type="email" placeholder="Client Email" />
+            <input type="password" placeholder="Password" />
+            <button class="save-btn">Save</button>
+            <button class="close-btn">Cancel</button>
+        </div>
+    </div>
+
+</body>
+</html>
