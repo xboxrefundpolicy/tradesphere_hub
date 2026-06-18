@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Tradesphere Hub – Client Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        :root {
+            --bg-primary: #0A0A0A;
+            --bg-card: #141414;
+            --bg-input: #1E1E1E;
+            --border-color: #2A2A2A;
+            --text-primary: #FFFFFF;
+            --text-secondary: #A0A0A0;
+            --accent-gold: #F59E0B;
+            --accent-gold-hover: #D97706;
+            --radius: 16px;
+            --shadow: 0 8px 32px rgba(0,0,0,0.5);
+            --success: #10B981;
+            --danger: #EF4444;
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container { max-width: 1200px; width:100%; }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0 16px;
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .logo { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .logo-icon {
+            background: linear-gradient(135deg, var(--accent-gold), #FBBF24);
+            color: #000; width: 38px; height: 38px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; font-weight: 800;
+        }
+        .logo-text { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
+        .logo-text span { color: var(--accent-gold); }
+        .nav { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 6px 12px;
+            border-radius: 8px;
+            transition: 0.3s ease;
+        }
+        .nav a:hover { color: var(--text-primary); background: rgba(255,255,255,0.05); }
+        .nav a.active { color: var(--accent-gold); background: rgba(245,158,11,0.1); }
+
+        .hero { text-align: center; padding: 28px 0 20px; }
+        .hero h1 {
+            font-size: 32px; font-weight: 800;
+            background: linear-gradient(135deg, #fff 40%, var(--accent-gold));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text; letter-spacing: -1px;
+        }
+        .hero p { color: var(--text-secondary); font-size: 15px; max-width: 480px; margin: 8px auto 0; }
+
+        #authScreen {
+            max-width: 400px; margin: 30px auto; background: var(--bg-card);
+            border: 1px solid var(--border-color); border-radius: var(--radius);
+            padding: 32px 28px; box-shadow: var(--shadow);
+        }
+        #authScreen h2 { font-size: 22px; font-weight: 700; margin-bottom: 6px; text-align: center; }
+        #authScreen p { color: var(--text-secondary); font-size: 14px; text-align: center; margin-bottom: 20px; }
+        #authScreen input {
+            width: 100%; padding: 14px 16px; background: var(--bg-input);
+            border: 1px solid var(--border-color); border-radius: 10px;
+            color: var(--text-primary); font-size: 15px; margin-bottom: 14px;
+            transition: border 0.3s ease;
+        }
+        #authScreen input:focus { outline: none; border-color: var(--accent-gold); }
+        #authScreen .auth-btn {
+            width: 100%; padding: 14px; background: var(--accent-gold);
+            color: #000; border: none; border-radius: 10px;
+            font-weight: 700; font-size: 16px; cursor: pointer; transition: 0.3s ease;
+        }
+        #authScreen .auth-btn:hover { background: var(--accent-gold-hover); transform: scale(1.01); }
+        #authScreen .auth-error { color: var(--danger); font-size: 13px; text-align: center; margin-top: 12px; display: none; }
+
+        #dashboard { display: none; }
+
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding-top: 16px;
+        }
+        .add-btn {
+            background: var(--accent-gold); color: #000; border: none;
+            padding: 10px 20px; border-radius: 40px; font-weight: 700; font-size: 14px;
+            cursor: pointer; transition: 0.3s ease; display: flex; align-items: center; gap: 8px;
+        }
+        .add-btn:hover { background: var(--accent-gold-hover); transform: scale(1.02); }
+
+        .client-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 14px;
+        }
+        .client-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 18px;
+            transition: all 0.3s ease;
+        }
+        .client-card:hover { border-color: var(--accent-gold); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+        .client-card .name { font-size: 17px; font-weight: 700; }
+        .client-card .email { color: var(--text-secondary); font-size: 13px; margin: 4px 0; }
+        .client-card .link-area {
+            background: var(--bg-input);
+            border-radius: 8px;
+            padding: 10px 12px;
+            margin: 10px 0;
+            font-size: 12px;
+            word-break: break-all;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        .client-card .link-area a { color: var(--accent-gold); text-decoration: none; flex: 1; }
+        .client-card .link-area a:hover { text-decoration: underline; }
+        .client-card .link-area .copy-btn {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+        .client-card .link-area .copy-btn:hover { background: rgba(245,158,11,0.15); color: var(--accent-gold); border-color: var(--accent-gold); }
+        .client-card .actions { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+        .client-card .delete-btn { background: rgba(239,68,68,0.08); color: var(--danger); border: none; padding: 5px 12px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; transition: 0.3s ease; }
+        .client-card .delete-btn:hover { background: rgba(239,68,68,0.2); }
+
+        .empty-state {
+            text-align: center; padding: 40px 20px;
+            color: var(--text-secondary);
+            grid-column: 1 / -1;
+        }
+        .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+        .empty-state h3 { font-size: 18px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            backdrop-filter: blur(4px);
+            animation: fadeIn 0.3s ease;
+        }
+        .modal-overlay.active { display: flex; }
+        @keyframes fadeIn { from { opacity:0; transform:scale(0.95); } to { opacity:1; transform:scale(1); } }
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            max-width: 480px;
+            width: 100%;
+            padding: 28px 24px;
+            box-shadow: var(--shadow);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal h2 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+        .modal .subtitle { color: var(--text-secondary); font-size: 13px; margin-bottom: 16px; }
+        .modal label { display: block; font-weight: 500; font-size: 13px; margin-bottom: 4px; color: var(--text-secondary); }
+        .modal input {
+            width: 100%;
+            padding: 11px 14px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 14px;
+            margin-bottom: 14px;
+            transition: border 0.3s ease;
+        }
+        .modal input:focus { outline: none; border-color: var(--accent-gold); }
+        .modal .btn-group { display: flex; gap: 10px; margin-top: 4px; }
+        .modal .btn-group .submit-btn {
+            flex: 1;
+            padding: 12px;
+            background: var(--accent-gold);
+            color: #000;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+        .modal .btn-group .submit-btn:hover { background: var(--accent-gold-hover); }
+        .modal .btn-group .cancel-btn {
+            padding: 12px 20px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+        .modal .btn-group .cancel-btn:hover { background: rgba(255,255,255,0.1); }
+
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 14px 24px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            z-index: 2000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.4s ease;
+            max-width: 360px;
+        }
+        .toast.visible { transform: translateY(0); opacity: 1; }
+        .toast.success { border-color: var(--success); border-left: 4px solid var(--success); }
+        .toast.error { border-color: var(--danger); border-left: 4px solid var(--danger); }
+        .toast.info { border-color: var(--accent-gold); border-left: 4px solid var(--accent-gold); }
+
+        .footer {
+            margin-top: 32px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 12px; }
+            .hero h1 { font-size: 26px; }
+            .modal { padding: 20px 16px; }
+            #authScreen { padding: 20px 16px; }
+            .header { flex-direction: column; align-items: flex-start; }
+            .client-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 480px) {
+            .modal .btn-group { flex-direction: column; }
+            .modal .btn-group .cancel-btn { padding: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <header class="header">
+            <div class="logo" onclick="window.location.reload()">
+                <div class="logo-icon">TS</div>
+                <div class="logo-text">Tradesphere<span>Hub</span></div>
+            </div>
+            <nav class="nav">
+                <a href="index.html">🏠 Home</a>
+                <a class="active" href="#">📦 Portal</a>
+                <a href="tracking.html">📊 Tracking</a>
+            </nav>
+        </header>
+
+        <section class="hero">
+            <h1>Client Portal</h1>
+            <p>Manage your clients and logs.</p>
+        </section>
+
+        <!-- AUTH SCREEN -->
+        <div id="authScreen">
+            <h2>🔐 Admin Access</h2>
+            <p>Enter your admin password to continue.</p>
+            <input type="password" id="adminPassword" placeholder="Enter admin password..." autofocus />
+            <button class="auth-btn" id="authBtn">Access Dashboard</button>
+            <div class="auth-error" id="authError">Incorrect password. Please try again.</div>
+        </div>
+
+        <!-- DASHBOARD -->
+        <div id="dashboard">
+
+            <div class="toolbar">
+                <button class="add-btn" id="addClientBtn">+ Add Client</button>
+            </div>
+
+            <div id="clientStatus" class="status"></div>
+
+            <div class="client-grid" id="clientGrid"></div>
+        </div>
+
+        <!-- MODAL -->
+        <div class="modal-overlay" id="modalOverlay">
+            <div class="modal">
+                <h2>Add New Client</h2>
+                <div class="subtitle">Enter client details below.</div>
+
+                <label>Client Name *</label>
+                <input type="text" id="clientName" placeholder="e.g., John Smith" />
+
+                <label>Client Email</label>
+                <input type="email" id="clientEmail" placeholder="e.g., john@example.com" />
+
+                <label>Password *</label>
+                <input type="text" id="clientPasswordInput" placeholder="Set a password for this client" />
+
+                <div class="btn-group">
+                    <button class="submit-btn" id="modalSubmitBtn">Save Client</button>
+                    <button class="cancel-btn" id="modalCancelBtn">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="toast" id="toast"></div>
+
+        <div class="footer">
+            <p>© 2026 Tradesphere Hub · Client Portal</p>
+        </div>
+
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            const ADMIN_PASSWORD = 'admindelight200515$$';
+            let isAuthenticated = false;
+            let clients = [];
+
+            // DOM REFS
+            const authScreen = document.getElementById('authScreen');
+            const dashboard = document.getElementById('dashboard');
+            const adminPassword = document.getElementById('adminPassword');
+            const authBtn = document.getElementById('authBtn');
+            const authError = document.getElementById('authError');
+
+            const addClientBtn = document.getElementById('addClientBtn');
+            const modalOverlay = document.getElementById('modalOverlay');
+            const clientName = document.getElementById('clientName');
+            const clientEmail = document.getElementById('clientEmail');
+            const clientPasswordInput = document.getElementById('clientPasswordInput');
+            const modalSubmitBtn = document.getElementById('modalSubmitBtn');
+            const modalCancelBtn = document.getElementById('modalCancelBtn');
+
+            const clientGrid = document.getElementById('clientGrid');
+            const toast = document.getElementById('toast');
+
+            function showToast(message, type) {
+                type = type || 'info';
+                toast.textContent = message;
+                toast.className = 'toast ' + type + ' visible';
+                clearTimeout(toast._timeout);
+                toast._timeout = setTimeout(function() { toast.classList.remove('visible'); }, 3000);
+            }
+
+            function generateId() {
+                return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+            }
+
+            function generateLink(clientId) {
+                return window.location.origin + window.location.pathname + '?client=' + clientId;
+            }
+
+            function formatDate(ts) {
+                if (!ts) return 'N/A';
+                return new Date(ts).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+            }
+
+            function escapeHtml(text) {
+                if (!text) return '';
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            function loadClients() {
+                try {
+                    const data = localStorage.getItem('tradesphere_clients_v3');
+                    if (data) {
+                        clients = JSON.parse(data);
+                    } else {
+                        // DEMO CLIENT
+                        clients = [{
+                            id: 'demo1',
+                            name: 'Denmark TikTok Client',
+                            email: 'demo@example.com',
+                            password: 'demo123',
+                            logs: [],
+                            createdAt: Date.now() - 172800000,
+                            lastView: null,
+                            expiryDays: 14,
+                            loginAttempts: 0,
+                            lockedUntil: 0
+                        }];
+                        saveClients();
+                    }
+                } catch (e) { clients = []; }
+                return clients;
+            }
+
+            function saveClients() {
+                localStorage.setItem('tradesphere_clients_v3', JSON.stringify(clients));
+            }
+
+            function renderClients() {
+                loadClients();
+
+                if (clients.length === 0) {
+                    clientGrid.innerHTML = `
+                        <div class="empty-state">
+                            <div class="icon">📂</div>
+                            <h3>No clients yet</h3>
+                            <p>Click "Add Client" to get started.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                var html = '';
+                for (var i = 0; i < clients.length; i++) {
+                    var client = clients[i];
+                    var logCount = client.logs ? client.logs.length : 0;
+
+                    html += `
+                        <div class="client-card">
+                            <div class="name">👤 ${escapeHtml(client.name)}</div>
+                            <div class="email">📧 ${escapeHtml(client.email || 'No email')}</div>
+                            <div style="font-size:13px; color:var(--text-secondary); margin-bottom:6px;">
+                                📄 ${logCount} log(s)
+                            </div>
+                            <div class="link-area">
+                                <a href="${generateLink(client.id)}" target="_blank">${generateLink(client.id)}</a>
+                                <button class="copy-btn" data-link="${generateLink(client.id)}">📋 Copy</button>
+                            </div>
+                            <div class="actions">
+                                <button class="delete-btn" data-id="${client.id}">🗑️ Delete</button>
+                            </div>
+                        </div>
+                    `;
+                }
+                clientGrid.innerHTML = html;
+
+                // Copy link buttons
+                document.querySelectorAll('.copy-btn').forEach(function(btn) {
+                    btn.addEventListener('click', function() {
+                        var link = this.dataset.link;
+                        if (navigator.clipboard && navigator.clipboard.writeText) {
+                            navigator.clipboard.writeText(link).then(function() {
+                                showToast('Link copied!', 'success');
+                            }).catch(function() {
+                                var textarea = document.createElement('textarea');
+                                textarea.value = link;
+                                document.body.appendChild(textarea);
+                                textarea.select();
+                                document.execCommand('copy');
+                                document.body.removeChild(textarea);
+                                showToast('Link copied!', 'success');
+                            });
+                        } else {
+                            var textarea = document.createElement('textarea');
+                            textarea.value = link;
+                            document.body.appendChild(textarea);
+                            textarea.select();
+                            document.execCommand('copy');
+                            document.body.removeChild(textarea);
+                            showToast('Link copied!', 'success');
+                        }
+                    });
+                });
+
+                // Delete buttons
+                document.querySelectorAll('.delete-btn').forEach(function(btn) {
+                    btn.addEventListener('click', function() {
+                        var id = this.dataset.id;
+                        var client = null;
+                        for (var j = 0; j < clients.length; j++) {
+                            if (clients[j].id === id) { client = clients[j]; break; }
+                        }
+                        if (confirm('Delete "' + (client ? client.name : 'this client') + '" and all their logs?')) {
+                            clients = clients.filter(function(c) { return c.id !== id; });
+                            saveClients();
+                            renderClients();
+                            showToast('Client deleted.', 'info');
+                        }
+                    });
+                });
+            }
+
+            // AUTH
+            function login() {
+                var password = adminPassword.value.trim();
+                if (password === ADMIN_PASSWORD) {
+                    isAuthenticated = true;
+                    authScreen.style.display = 'none';
+                    dashboard.style.display = 'block';
+                    authError.style.display = 'none';
+                    adminPassword.value = '';
+                    renderClients();
+                    showToast('Welcome back!', 'success');
+                } else {
+                    authError.style.display = 'block';
+                    setTimeout(function() { authError.style.display = 'none'; }, 3000);
+                }
+            }
+
+            // MODAL
+            function openModal() {
+                modalOverlay.classList.add('active');
+                clientName.value = '';
+                clientEmail.value = '';
+                clientPasswordInput.value = '';
+            }
+
+            function closeModal() {
+                modalOverlay.classList.remove('active');
+            }
+
+            function saveClient() {
+                var name = clientName.value.trim();
+                var email = clientEmail.value.trim();
+                var password = clientPasswordInput.value.trim();
+
+                if (!name) { showToast('Please enter a client name.', 'error'); return; }
+                if (!password) { showToast('Please set a password for the client.', 'error'); return; }
+
+                var newClient = {
+                    id: generateId(),
+                    name: name,
+                    email: email || '',
+                    password: password,
+                    logs: [],
+                    createdAt: Date.now(),
+                    lastView: null,
+                    expiryDays: 14,
+                    loginAttempts: 0,
+                    lockedUntil: 0
+                };
+
+                clients.push(newClient);
+                saveClients();
+                closeModal();
+                renderClients();
+                showToast('✅ Client ' + name + ' added!', 'success');
+            }
+
+            // EVENT LISTENERS
+            authBtn.addEventListener('click', login);
+            adminPassword.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') login();
+            });
+
+            addClientBtn.addEventListener('click', function() {
+                openModal();
+            });
+
+            modalCancelBtn.addEventListener('click', closeModal);
+            modalSubmitBtn.addEventListener('click', saveClient);
+
+            modalOverlay.addEventListener('click', function(e) {
+                if (e.target === this) closeModal();
+            });
+
+            // INIT
+            loadClients();
+            console.log('📦 Client Portal loaded');
+            console.log('👥 Clients:', clients.length);
+            console.log('🔑 Admin password: admindelight200515$$');
+
+        })();
+    </script>
+
+</body>
+</html>
